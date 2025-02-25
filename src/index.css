@@ -5,9 +5,17 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+    background: linear-gradient(#001529, #483D8B, #00CED1);  min-height: 100vh; /* Asegura que cubra toda la altura de la pantalla */
+
+
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+body {
+  background-color: #f0f2f5;
+}
+

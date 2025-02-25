@@ -1,0 +1,36 @@
+.landing-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(#001529, #483D8B, #00CED1);
+    padding: 20px;
+  }
+ 
+  
+  .cards-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .custom-card {
+    width: 250px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.15); 
+    backdrop-filter: blur(10px); 
+    border-radius: 10px; 
+    color: rgb(255, 132, 132);
+    backdrop-filter: blur(30px);
+    border: 2px solid #fff;
+  }
+  
+  .custom-card .ant-typography {
+    color: white;
+  }
+  
+  .buttons-container {
+    margin-top: 30px;
+  }
+  

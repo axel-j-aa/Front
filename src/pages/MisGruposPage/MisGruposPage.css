@@ -1,0 +1,48 @@
+/* Estilo para los botones de cambiar estado */
+.task-status-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 5px;
+  }
+  
+  .task-status-button:hover {
+    background-color: #1890ff;
+    color: white;
+  }
+  
+  .task-status-button:disabled {
+    background-color: #f0f0f0;
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Estilo específico para los iconos */
+  .task-status-button .anticon {
+    margin-right: 8px;
+  }
+  
+  /* Botones específicos para cada estado */
+  .task-status-button.por-hacer {
+    background-color: #ffec3d;
+    color: #595959;
+  }
+  
+  .task-status-button.en-proceso {
+    background-color: #1890ff;
+    color: white;
+  }
+  
+  .task-status-button.hecho {
+    background-color: #52c41a;
+    color: white;
+  }
+  
+  
+  
+  
+  
