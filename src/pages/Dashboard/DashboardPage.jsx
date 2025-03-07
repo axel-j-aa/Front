@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../axiosConfig'; // Importa la instancia de axios configurada
 import './DashboardPage.css';
 import BotonFlotante from '../../Components/BotonFlotante/BotonFlotante';
 import Tasks from '../../Components/Tasks/Tasks';
@@ -15,15 +16,12 @@ const DashboardPage = () => {
     if (!userId || !token) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/tasks?userId=${userId}`, {
-        method: 'GET',
+      const { data } = await axiosInstance.get(`tasks?userId=${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        },
       });
-      const data = await response.json();
-      setTasks(data);
+      setTasks(data); // Directly using destructured data
     } catch (error) {
       console.error('Error al cargar las tareas:', error);
     }
@@ -57,17 +55,13 @@ const DashboardPage = () => {
   return (
     <div className="dashboard-container">
       <div className='user-card'>
-      <h1 className="dashboard-username">Bienvenido, {username}</h1>
-      
+        <h1 className="dashboard-username">Bienvenido, {username}</h1>
       </div>
 
       <Tasks userId={userId} tasks={tasks} fetchTasks={fetchTasks} />
-      <BotonFlotante fetchTasks={fetchTasks} /> 
+      <BotonFlotante fetchTasks={fetchTasks} />
     </div>
   );
 };
 
 export default DashboardPage;
-
-
-

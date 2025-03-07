@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Col, Row, Button } from "antd";
-import {
-  CheckOutlined,
-  ClockCircleOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons"; 
+import { CheckOutlined, ClockCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import "./Tasks.css";
+import axiosInstance from '../../axiosConfig';  // Importa axios configurado
 
 const Tasks = ({ userId }) => {
   const [tasks, setTasks] = useState([]);
@@ -18,27 +15,12 @@ const Tasks = ({ userId }) => {
     const fetchTasks = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const response = await fetch(
-          `http://localhost:3000/api/tasks?userId=${userId}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const { data } = await axiosInstance.get(`/tasks?userId=${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        const text = await response.text();
-
-        if (!response.ok) {
-          console.log("Response:", text);
-          throw new Error(
-            `Error al obtener las tareas (HTTP ${response.status}): ${text}`
-          );
-        }
-
-        const data = JSON.parse(text);
         setTasks(data);
       } catch (err) {
         setError(err.message);
@@ -50,61 +32,22 @@ const Tasks = ({ userId }) => {
     fetchTasks();
   }, [userId]);
 
-  const handleComplete = async (taskId) => {
+  const handleStatusUpdate = async (taskId, status) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch(`http://localhost:3000/api/task/complete`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ taskId }),
-      });
+      const endpoint = status === "Hecho" ? "/complete" : "/pending";
+      await axiosInstance.post(`/task${endpoint}`, 
+        { taskId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
-      const text = await response.text();
-
-      if (!response.ok) {
-        console.log("Response:", text);
-        throw new Error(
-          `Error al completar la tarea (HTTP ${response.status}): ${text}`
-        );
-      }
-
-      setTasks(
-        tasks.map((task) =>
-          task.id === taskId ? { ...task, status: "Hecho" } : task
-        )
-      );
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  const handlePending = async (taskId) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const response = await fetch(`http://localhost:3000/api/task/pending`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ taskId }),
-      });
-
-      const text = await response.text();
-
-      if (!response.ok) {
-        console.log("Response:", text);
-        throw new Error(
-          `Error al cambiar el estado a En proceso (HTTP ${response.status}): ${text}`
-        );
-      }
-
-      setTasks(
-        tasks.map((task) =>
-          task.id === taskId ? { ...task, status: "En proceso" } : task
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId ? { ...task, status } : task
         )
       );
     } catch (err) {
@@ -115,25 +58,15 @@ const Tasks = ({ userId }) => {
   const handleDelete = async (taskId) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch(`http://localhost:3000/api/task/delete`, {
-        method: "DELETE",
+      await axiosInstance.delete(`/task/delete`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ taskId }),
+        data: { taskId },
       });
 
-      const text = await response.text();
-
-      if (!response.ok) {
-        console.log("Response:", text);
-        throw new Error(
-          `Error al eliminar la tarea (HTTP ${response.status}): ${text}`
-        );
-      }
-
-      setTasks(tasks.filter((task) => task.id !== taskId));
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
     } catch (err) {
       setError(err.message);
     }
@@ -144,7 +77,7 @@ const Tasks = ({ userId }) => {
 
   return (
     <div className="tasks-container">
-      <h2>Tus Tareas</h2>
+      <h2 style={{ color: "white" }}>Tus Tareas</h2>
       {tasks.length === 0 ? (
         <p>No tienes tareas asignadas.</p>
       ) : (
@@ -169,25 +102,20 @@ const Tasks = ({ userId }) => {
                 <div className="task-actions">
                   <Button
                     type="primary"
-                    className="action-button"
                     icon={<CheckOutlined />}
-                    onClick={() => handleComplete(task.id)}
-                    disabled={task.status === "Completada"} 
-                  >
-                  </Button>
-
+                    onClick={() => handleStatusUpdate(task.id, "Hecho")}
+                    disabled={task.status === "Completada"}
+                  />
                   <Button
                     type="default"
-                    className="action-button"
                     icon={<ClockCircleOutlined />}
-                    onClick={() => handlePending(task.id)}
-                  ></Button>
+                    onClick={() => handleStatusUpdate(task.id, "En proceso")}
+                  />
                   <Button
                     type="danger"
-                    className="action-button"
                     icon={<DeleteOutlined />}
                     onClick={() => handleDelete(task.id)}
-                  ></Button>
+                  />
                 </div>
               </Card>
             </Col>

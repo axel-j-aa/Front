@@ -6,7 +6,8 @@ import RegisterPage from './pages/RegisterPage/RegisterPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import GruposPage from './pages/GruposPage/GruposPage';
 import BuzonPage from './pages/BuzonPage/BuzonPage';
-import MisGruposPage from './pages/MisGruposPage/MisGruposPage';  // Asegúrate de importar la nueva página
+import MisGruposPage from './pages/MisGruposPage/MisGruposPage';
+import UsuariosPage from './pages/UsuariosPage/Usuarios';
 import MainLayout from './layouts/MainLayout';
 
 function App() {
@@ -19,7 +20,8 @@ function App() {
         <Route path="/dashboard" element={<MainLayout><DashboardPage /></MainLayout>} />
         <Route path="/dashboard/grupos" element={<MainLayout><GruposPage /></MainLayout>} />
         <Route path="/dashboard/buzon" element={<MainLayout><BuzonPage /></MainLayout>} />
-        <Route path="/dashboard/mis-grupos" element={<MainLayout><MisGruposPage /></MainLayout>} /> {/* Nueva ruta */}
+        <Route path="/dashboard/mis-grupos" element={<MainLayout><MisGruposPage /></MainLayout>} />
+        <Route path="/dashboard/usuarios" element={<MainLayout><UsuariosPage /></MainLayout>} /> {/* Nueva ruta */}
       </Routes>
     </Router>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Input, Form, Select, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import axiosInstance from '../../axiosConfig'; // Importa la instancia de axios configurada
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -17,9 +17,9 @@ const BotonGrupo = () => {
     const fetchUsuarios = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3000/api/usuarios'); // Cambia la URL si tu backend está en otro puerto
+        const response = await axiosInstance.get('usuarios');  // Usando la instancia de axios configurada
         console.log("Usuarios obtenidos del backend:", response.data);
-        setUsuarios(response.data);  // Guardamos los usuarios en el estado
+        setUsuarios(response.data);  
       } catch (error) {
         message.error("Error al obtener la lista de usuarios");
         console.error("Error:", error);
@@ -27,12 +27,12 @@ const BotonGrupo = () => {
       setLoading(false);
     };
 
-    const userData = JSON.parse(localStorage.getItem('user')); // Obtener el correo desde localStorage
+    const userData = JSON.parse(localStorage.getItem('user')); 
     if (userData && userData.email) {
-      setUserEmail(userData.email); // Guardamos el correo del usuario logueado
+      setUserEmail(userData.email); 
     }
 
-    fetchUsuarios(); // Ejecuta la función al cargar el componente
+    fetchUsuarios();
   }, []);
 
   const showModal = () => {
@@ -52,17 +52,15 @@ const BotonGrupo = () => {
           return;
         }
 
-        // Datos a enviar al backend
         const groupData = {
-          created_by: userEmail,  // Asegúrate de que este campo esté correctamente seteado
+          created_by: userEmail,  
           description: values.descripcion,
-          members: values.miembros, // Array con los correos de los miembros
-          name: values.nombreGrupo,  // Nombre del grupo
+          members: values.miembros, 
+          name: values.nombreGrupo,  
         };
 
         try {
-          // Realizamos la solicitud POST para crear el grupo
-          const response = await axios.post('http://localhost:3000/api/groups', groupData);
+          const response = await axiosInstance.post('groups', groupData);  // Usando la instancia de axios configurada
           console.log("Grupo creado:", response.data);
           message.success("Grupo creado exitosamente");
           setVisible(false);
@@ -105,29 +103,25 @@ const BotonGrupo = () => {
           <Form.Item
             label="Nombre del Grupo"
             name="nombreGrupo"
-            rules={[{ required: true, message: 'Por favor, ingresa un nombre' }]}
-          >
+            rules={[{ required: true, message: 'Por favor, ingresa un nombre' }]}>
             <Input placeholder="Ingrese el nombre del grupo" />
           </Form.Item>
 
           <Form.Item
             label="Descripción"
             name="descripcion"
-            rules={[{ required: true, message: 'Por favor, ingresa una descripción' }]}
-          >
+            rules={[{ required: true, message: 'Por favor, ingresa una descripción' }]}>
             <TextArea rows={3} placeholder="Ingrese una descripción" />
           </Form.Item>
 
           <Form.Item
             label="Seleccionar Miembros"
             name="miembros"
-            rules={[{ required: true, message: 'Seleccione al menos un usuario' }]}
-          >
+            rules={[{ required: true, message: 'Seleccione al menos un usuario' }]}>
             <Select
               mode="multiple"
               placeholder="Seleccione los usuarios"
-              loading={loading}
-            >
+              loading={loading}>
               {usuarios && usuarios.length > 0 ? (
                 usuarios.map(user => (
                   <Option key={user.email} value={user.email}>

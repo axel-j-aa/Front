@@ -1,0 +1,76 @@
+
+.grupos-container {
+    background: linear-gradient(#001529, #483D8B, #00CED1);  min-height: 100vh; 
+    padding: 10px;
+  }
+  
+  .Titulo{
+    margin-left: 10px;
+    color: #FFFACD;
+    
+    
+    }
+    
+  
+  
+  .card-group:hover {
+    transform: translateY(-5px);
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.15);
+    border: 1px solid #1890ff;
+    
+  }
+  
+  .card-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .card-description {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+  }
+  
+  .card-actions button {
+    font-weight: bold;
+  }
+  
+
+  .add-member-button {
+    margin-top: 10px;
+    background-color: #1890ff;
+    color: white;
+    width: 100%;
+  }
+  
+  .add-member-button:hover {
+    background-color: #40a9ff;
+  }
+  
+
+  .icono-editar {
+    font-size: 20px;
+    color: #1890ff;
+    transition: color 0.3s ease;
+  }
+  
+  .icono-editar:hover {
+    color: #0056b3; 
+  }
+  
+  .icono-eliminar {
+    font-size: 20px;
+    color: #ff4d4f; 
+    transition: color 0.3s ease;
+  }
+  
+  .icono-eliminar:hover {
+    color: #b30000;
+  }
+  

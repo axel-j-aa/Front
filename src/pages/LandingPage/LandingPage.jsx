@@ -10,7 +10,7 @@ const LandingPage = () => {
 
   return (
     <div className="landing-container">
-      <Title level={1}  className="landing-title">Bienvenido!!!</Title>
+      <Title level={1}  className="landing-title" style={{color: 'white'}}>Bienvenido!!!</Title>
 
       <div className="cards-container">
         <Card title="Organización" bordered={false} className="custom-card">

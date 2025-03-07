@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Layout, Menu, Button } from 'antd';
 import {
   DashboardOutlined,
@@ -16,15 +16,31 @@ const MainLayout = ({ children }) => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  const [userEmail, setUserEmail] = useState('');
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    navigate('/login');
+  }, [navigate]);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
-    if (userData) {
+    const token = localStorage.getItem('authToken'); 
+
+    if (userData && token) {
       setUserRole(userData.rol);
-      setUserEmail(userData.email);
+    } else {
+      navigate('/login'); 
     }
-  }, []);
+
+    const logoutAfterTimeout = setTimeout(() => {
+      handleLogout(); 
+    }, 10 * 60 * 1000); 
+
+    return () => {
+      clearTimeout(logoutAfterTimeout);
+    };
+  }, [navigate, handleLogout]);
 
   const handleToggle = () => {
     setCollapsed(!collapsed);
@@ -37,7 +53,7 @@ const MainLayout = ({ children }) => {
       label: 'Dashboard',
       onClick: () => navigate('/dashboard'),
     },
-    {
+    (userRole === 'Master' || userRole === 'Admin') && {
       key: 'usuarios',
       icon: <UserOutlined />,
       label: 'Usuarios',
@@ -68,12 +84,6 @@ const MainLayout = ({ children }) => {
       onClick: () => navigate('/dashboard/configuracion'),
     },
   ].filter(Boolean);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
 
   return (
     <Layout style={{ minHeight: '100vh', margin: 0, padding: 0 }}>

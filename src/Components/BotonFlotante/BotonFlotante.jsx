@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { Modal, Button, Form, Input, Select, message } from "antd";
 import moment from "moment";
 import "./BotonFlotante.css";
+import axiosInstance from '../../axiosConfig'; 
 
 const BotonFlotante = ({ fetchTasks }) => {
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
 
-  const showModal = () => {
-    setVisible(true);
-  };
+  const showModal = () => setVisible(true);
 
   const handleOk = async () => {
     try {
@@ -17,34 +16,25 @@ const BotonFlotante = ({ fetchTasks }) => {
       const deadline = moment().add(3, "days").toISOString();
       const user = JSON.parse(localStorage.getItem("user"));
 
-      if (!user || !user.docId) {
+      if (!user?.docId) {
         message.error("Error: No se pudo obtener el ID del usuario.");
         return;
       }
 
       const newTask = { ...values, deadline, userId: user.docId };
 
-      const response = await fetch("http://localhost:3000/api/task", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newTask),
-      });
+      // Usamos axiosInstance para hacer la solicitud
+      const response = await axiosInstance.post('task', newTask);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Error al crear la tarea.");
+      if (response.status === 200) {
+        message.success("Tarea creada exitosamente.");
+        form.resetFields();
+        setVisible(false);
+        fetchTasks();
+      } else {
+        throw new Error(response.data.message || "Error al crear la tarea.");
       }
-
-      message.success("Tarea creada exitosamente.");
-      console.log("Respuesta del servidor:", data);
-      form.resetFields();
-      setVisible(false);
-      fetchTasks();
     } catch (error) {
-      console.error("Error al crear tarea:", error);
       message.error(`Error: ${error.message}`);
     }
   };
@@ -100,15 +90,9 @@ const BotonFlotante = ({ fetchTasks }) => {
             rules={[{ required: true, message: "Por favor selecciona el estado" }]}
           >
             <Select placeholder="Selecciona el estado">
-              <Select.Option value="Hecho">
-                <span style={{ color: "green" }}>Hecho</span>
-              </Select.Option>
-              <Select.Option value="En proceso">
-                <span style={{ color: "orange" }}>En proceso</span>
-              </Select.Option>
-              <Select.Option value="Por hacer">
-                <span style={{ color: "red" }}>Por hacer</span>
-              </Select.Option>
+              <Select.Option value="Hecho">Hecho</Select.Option>
+              <Select.Option value="En proceso">En proceso</Select.Option>
+              <Select.Option value="Por hacer">Por hacer</Select.Option>
             </Select>
           </Form.Item>
         </Form>

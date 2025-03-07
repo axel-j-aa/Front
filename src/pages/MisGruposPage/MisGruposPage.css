@@ -1,4 +1,16 @@
-/* Estilo para los botones de cambiar estado */
+.MisGruposPage {
+  background: linear-gradient(#001529, #483D8B, #00CED1);  min-height: 100vh; 
+  padding: 10px;
+}
+.titulo{
+  color: white;
+}
+
+.estados{
+  color: white;
+}
+
+
 .task-status-button {
     display: inline-flex;
     align-items: center;
@@ -21,12 +33,10 @@
     cursor: not-allowed;
   }
   
-  /* Estilo específico para los iconos */
   .task-status-button .anticon {
     margin-right: 8px;
   }
   
-  /* Botones específicos para cada estado */
   .task-status-button.por-hacer {
     background-color: #ffec3d;
     color: #595959;
@@ -42,7 +52,8 @@
     color: white;
   }
   
-  
-  
+  .kanban-board{
+    background: transparent;
+  }
   
   
