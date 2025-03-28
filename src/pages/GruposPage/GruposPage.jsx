@@ -3,6 +3,7 @@ import { Card, Button, Modal, message, Col, Row, Input, List } from "antd";
 import axios from "axios";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import BotonGrupo from "./BotonGrupo";
+import axiosInstance from '../../axiosConfig'; // Importa la instancia de axios configurada
 import "./GruposPage.css";
 
 const GruposPage = () => {
@@ -25,8 +26,8 @@ const GruposPage = () => {
           return;
         }
 
-        const response = await axios.get(
-          `http://localhost:3000/api/groups?userId=${userData.email}`
+        const response = await axiosInstance.get(
+          `/groups?userId=${userData.email}`
         );
         if (Array.isArray(response.data)) {
           setGrupos(response.data);
