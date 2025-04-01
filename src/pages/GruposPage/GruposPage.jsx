@@ -25,6 +25,7 @@ const GruposPage = () => {
       }
 
       const response = await axiosInstance.get(`/groups?userId=${userData.email}`);
+      console.log("Grupos recibidos del backend:", response.data); // Para depuración
       if (Array.isArray(response.data)) {
         setGrupos(response.data);
       } else {
@@ -32,6 +33,7 @@ const GruposPage = () => {
       }
     } catch (error) {
       message.error("Error al obtener los grupos");
+      console.error("Error en fetchGrupos:", error);
     }
   };
 
@@ -82,7 +84,7 @@ const GruposPage = () => {
           )
         );
         message.success("Grupo editado exitosamente");
-        fetchGrupos();
+        fetchGrupos(); // Recarga la lista para asegurar consistencia
         setIsModalVisible(false);
       }
     } catch (error) {
@@ -118,7 +120,7 @@ const GruposPage = () => {
         <h2>Grupos</h2>
         <p>Aquí puedes gestionar los grupos.</p>
       </div>
-      <BotonGrupo fetchGrupos={fetchGrupos} /> {/* Cambio aquí */}
+      <BotonGrupo fetchGrupos={fetchGrupos} />
 
       <div style={{ marginTop: 20 }}>
         {grupos.length === 0 ? (

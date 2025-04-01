@@ -18,7 +18,7 @@ const BotonGrupo = ({ fetchGrupos }) => {
       setLoading(true);
       try {
         const response = await axiosInstance.get('usuarios');
-        console.log("Usuarios obtenidos del backend:", response.data);
+        console.log("Usuarios obtenidos del backend:", response.data); // Para depuración
         setUsuarios(response.data);
       } catch (error) {
         message.error("Error al obtener la lista de usuarios");
@@ -61,20 +61,21 @@ const BotonGrupo = ({ fetchGrupos }) => {
 
         try {
           const response = await axiosInstance.post('groups', groupData);
-          console.log("Grupo creado:", response.data);
+          console.log("Grupo creado:", response.data); // Para depuración
           message.success("Grupo creado exitosamente");
           setVisible(false);
           form.resetFields();
+          console.log("Actualizando lista de grupos..."); // Para depuración
           if (fetchGrupos) {
             await fetchGrupos(); // Actualiza la lista de grupos
+            console.log("Lista de grupos actualizada"); // Para depuración
           }
         } catch (error) {
           console.error("Error al crear el grupo:", error);
-          // Verifica si el error es por un grupo duplicado
           if (error.response && error.response.status === 400 && error.response.data.message) {
-            message.error(error.response.data.message); // Muestra el mensaje del backend
+            message.error(error.response.data.message);
           } else {
-            message.error("Error al crear el grupo"); // Mensaje genérico para otros errores
+            message.error("Error al crear el grupo");
           }
         }
       })
