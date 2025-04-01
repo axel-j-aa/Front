@@ -1,33 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { Card, Col, Row, Button } from "antd";
 import { CheckOutlined, ClockCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import "./Tasks.css";
 import axiosInstance from "../../axiosConfig";
 
-const Tasks = ({ userId, fetchTasks }) => {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  // Usamos useCallback para memorizar la función y evitar que se redefina en cada renderizado
-  const fetchTasksData = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const { data } = await axiosInstance.get(`/tasks?userId=${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setTasks(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    if (!userId) return;
-    fetchTasksData(); // Llamamos a fetchTasks
-  }, [userId, fetchTasksData]);
+const Tasks = ({ userId, tasks, fetchTasks }) => {
 
   const updateTaskStatus = async (taskId, status) => {
     try {
@@ -41,7 +18,7 @@ const Tasks = ({ userId, fetchTasks }) => {
       });
       fetchTasks(); // Actualizamos las tareas después de cambiar el estado
     } catch (err) {
-      setError(err.message);
+      console.error(err.message);
     }
   };
 
@@ -57,12 +34,9 @@ const Tasks = ({ userId, fetchTasks }) => {
       });
       fetchTasks(); // Recargamos las tareas después de eliminar
     } catch (err) {
-      setError(err.message);
+      console.error(err.message);
     }
   };
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="tasks-container">

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Modal, message, Col, Row, Input, List } from "antd";
-import axios from "axios";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import BotonGrupo from "./BotonGrupo";
-import axiosInstance from '../../axiosConfig'; // Importa la instancia de axios configurada
+import axiosInstance from '../../axiosConfig';
 import "./GruposPage.css";
 
 const GruposPage = () => {
@@ -17,28 +16,26 @@ const GruposPage = () => {
   });
   const [newMemberEmail, setNewMemberEmail] = useState("");
 
-  useEffect(() => {
-    const fetchGrupos = async () => {
-      try {
-        const userData = JSON.parse(localStorage.getItem("user"));
-        if (!userData || !userData.email) {
-          message.error("No se pudo obtener la información del usuario");
-          return;
-        }
+  const fetchGrupos = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("user"));
+      if (!userData || !userData.email) {
+        message.error("No se pudo obtener la información del usuario");
+        return;
+      }
 
-        const response = await axiosInstance.get(
-          `/groups?userId=${userData.email}`
-        );
-        if (Array.isArray(response.data)) {
-          setGrupos(response.data);
-        } else {
-          message.error("Error al obtener los grupos");
-        }
-      } catch (error) {
+      const response = await axiosInstance.get(`/groups?userId=${userData.email}`);
+      if (Array.isArray(response.data)) {
+        setGrupos(response.data);
+      } else {
         message.error("Error al obtener los grupos");
       }
-    };
+    } catch (error) {
+      message.error("Error al obtener los grupos");
+    }
+  };
 
+  useEffect(() => {
     fetchGrupos();
   }, []);
 
@@ -54,14 +51,9 @@ const GruposPage = () => {
             return;
           }
 
-          const response = await axios.delete(
-            `http://localhost:3000/api/groups/${groupId}?userId=${userData.email}`
-          );
-
+          const response = await axiosInstance.delete(`/groups/${groupId}?userId=${userData.email}`);
           if (response.status === 200) {
-            setGrupos((prevGrupos) =>
-              prevGrupos.filter((grupo) => grupo.id !== groupId)
-            );
+            setGrupos((prevGrupos) => prevGrupos.filter((grupo) => grupo.id !== groupId));
             message.success("Grupo eliminado exitosamente");
           } else {
             message.error("Error al eliminar el grupo");
@@ -80,26 +72,22 @@ const GruposPage = () => {
 
   const handleOk = async () => {
     try {
-      await axios.put(
-        `http://localhost:3000/api/groups/${grupoEdit.id}`,
-        grupoEdit
-      );
-      setGrupos((prevGrupos) =>
-        prevGrupos.map((grupo) =>
-          grupo.id === grupoEdit.id
-            ? { ...grupo, name: grupoEdit.name, description: grupoEdit.description, members: grupoEdit.members }
-            : grupo
-        )
-      );
-      message.success("Grupo editado exitosamente");
-      setIsModalVisible(false);
+      const response = await axiosInstance.put(`/groups/${grupoEdit.id}`, grupoEdit);
+      if (response.status === 200) {
+        setGrupos((prevGrupos) =>
+          prevGrupos.map((grupo) =>
+            grupo.id === grupoEdit.id
+              ? { ...grupo, name: grupoEdit.name, description: grupoEdit.description, members: grupoEdit.members }
+              : grupo
+          )
+        );
+        message.success("Grupo editado exitosamente");
+        fetchGrupos();
+        setIsModalVisible(false);
+      }
     } catch (error) {
       message.error("Error al editar el grupo");
     }
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
   };
 
   const handleAddMember = () => {
@@ -130,7 +118,7 @@ const GruposPage = () => {
         <h2>Grupos</h2>
         <p>Aquí puedes gestionar los grupos.</p>
       </div>
-      <BotonGrupo />
+      <BotonGrupo fetchGrupos={fetchGrupos} /> {/* Cambio aquí */}
 
       <div style={{ marginTop: 20 }}>
         {grupos.length === 0 ? (
@@ -144,16 +132,8 @@ const GruposPage = () => {
                   className="grupo-card"
                   hoverable
                   actions={[
-                    <EditOutlined
-                      key="edit"
-                      onClick={() => handleEdit(grupo)}
-                      className="icono-editar"
-                    />,
-                    <DeleteOutlined
-                      key="delete"
-                      onClick={() => handleDelete(grupo.id)}
-                      className="icono-eliminar"
-                    />,
+                    <EditOutlined key="edit" onClick={() => handleEdit(grupo)} className="icono-editar" />,
+                    <DeleteOutlined key="delete" onClick={() => handleDelete(grupo.id)} className="icono-eliminar" />,
                   ]}
                 >
                   <p className="card-description">
@@ -161,8 +141,7 @@ const GruposPage = () => {
                   </p>
                   {grupo.createdAt && (
                     <p>
-                      <strong>Creado el:</strong>{" "}
-                      {new Date(grupo.createdAt).toLocaleString()}
+                      <strong>Creado el:</strong> {new Date(grupo.createdAt).toLocaleString()}
                     </p>
                   )}
                   <p>
@@ -179,7 +158,7 @@ const GruposPage = () => {
         title="Editar Grupo"
         visible={isModalVisible}
         onOk={handleOk}
-        onCancel={handleCancel}
+        onCancel={() => setIsModalVisible(false)}
         okText="Guardar"
         cancelText="Cancelar"
       >
@@ -187,17 +166,13 @@ const GruposPage = () => {
           <Input
             placeholder="Nombre del grupo"
             value={grupoEdit.name}
-            onChange={(e) =>
-              setGrupoEdit({ ...grupoEdit, name: e.target.value })
-            }
+            onChange={(e) => setGrupoEdit({ ...grupoEdit, name: e.target.value })}
             style={{ marginBottom: 10 }}
           />
           <Input.TextArea
             placeholder="Descripción del grupo"
             value={grupoEdit.description}
-            onChange={(e) =>
-              setGrupoEdit({ ...grupoEdit, description: e.target.value })
-            }
+            onChange={(e) => setGrupoEdit({ ...grupoEdit, description: e.target.value })}
             style={{ marginBottom: 10 }}
           />
           <Input

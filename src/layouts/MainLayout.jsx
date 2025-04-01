@@ -3,10 +3,8 @@ import { Layout, Menu, Button } from 'antd';
 import {
   DashboardOutlined,
   UserOutlined,
-  SettingOutlined,
   LogoutOutlined,
   TeamOutlined,
-  MailOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
@@ -71,18 +69,7 @@ const MainLayout = ({ children }) => {
       label: 'Mis Grupos',
       onClick: () => navigate('/dashboard/mis-grupos'),
     },
-    {
-      key: 'buzon',
-      icon: <MailOutlined />,
-      label: 'Buzón',
-      onClick: () => navigate('/dashboard/buzon'),
-    },
-    {
-      key: 'configuracion',
-      icon: <SettingOutlined />,
-      label: 'Configuración',
-      onClick: () => navigate('/dashboard/configuracion'),
-    },
+    
   ].filter(Boolean);
 
   return (

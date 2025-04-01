@@ -1,6 +1,6 @@
 import React, { useState } from "react"; 
 import { Modal, Button, Form, Input, Select, message } from "antd";
-import axiosInstance from "../../axiosConfig";  // Importando la instancia de axios
+import axiosInstance from "../../axiosConfig";  
 import "./Task-Group.css";
 
 const TaskGroup = ({ fetchTareas, grupoNombre }) => { 
@@ -13,15 +13,12 @@ const TaskGroup = ({ fetchTareas, grupoNombre }) => {
 
   const handleOk = async () => {
     try {
-      // Validar los campos del formulario
       const values = await form.validateFields();
       
-      // Definir la fecha límite de la tarea sin usar moment
       const deadline = new Date();
-      deadline.setDate(deadline.getDate() + 3); // Sumar 3 días a la fecha actual
-      const deadlineISO = deadline.toISOString(); // Convertir la fecha a formato ISO
+      deadline.setDate(deadline.getDate() + 3); 
+      const deadlineISO = deadline.toISOString(); 
 
-      // Obtener el usuario del localStorage
       const user = JSON.parse(localStorage.getItem("user"));
   
       if (!user || !user.docId) {
@@ -29,7 +26,6 @@ const TaskGroup = ({ fetchTareas, grupoNombre }) => {
         return;
       }
   
-      // Crear el objeto de la nueva tarea
       const newTask = { 
         ...values, 
         deadline: deadlineISO, 
@@ -37,30 +33,24 @@ const TaskGroup = ({ fetchTareas, grupoNombre }) => {
         groupName: grupoNombre 
       };
   
-      // Enviar la solicitud al servidor usando axiosInstance
-      const response = await axiosInstance.post("task", newTask); // Usamos la instancia de axios
+      const response = await axiosInstance.post("task", newTask);
 
-      // Imprimir la respuesta para depuración
       console.log("Respuesta del servidor:", response.data);
 
-      // Comprobamos la respuesta de la API
-      if (response.status === 201) {  // Verifica que el código de estado sea 201 (creado)
-        message.success(response.data.message); // Mostrar el mensaje de éxito que devuelve el backend
+      if (response.status === 201) { 
+        message.success(response.data.message); 
         form.resetFields();
-        setVisible(false); // Cerrar el modal
-        fetchTareas(); // Actualizar la lista de tareas
+        setVisible(false); 
+        fetchTareas(); 
       } else {
-        // Si el servidor devuelve otro código de estado
         message.error(`🚨 Error: ${response.data.message || 'Error desconocido'}`);
       }
     } catch (error) {
       console.error("Error al crear tarea:", error);
 
-      // Manejo de errores específicos
       if (error.response && error.response.status === 400) {
         const errorMessage = error.response.data.message || "Error desconocido.";
         
-        // Verificar si el error tiene que ver con una tarea duplicada
         if (errorMessage.includes("Ya existe una tarea con este nombre")) {
           message.error("🚨 Ya existe una tarea con este nombre.");
         } else {

@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Input, Form, Select, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import axiosInstance from '../../axiosConfig'; // Importa la instancia de axios configurada
+import axiosInstance from '../../axiosConfig';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
-const BotonGrupo = () => {
+const BotonGrupo = ({ fetchGrupos }) => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [usuarios, setUsuarios] = useState([]);  
-  const [userEmail, setUserEmail] = useState(''); 
+  const [usuarios, setUsuarios] = useState([]);
+  const [userEmail, setUserEmail] = useState('');
   const [form] = Form.useForm();
 
   useEffect(() => {
     const fetchUsuarios = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get('usuarios');  // Usando la instancia de axios configurada
+        const response = await axiosInstance.get('usuarios');
         console.log("Usuarios obtenidos del backend:", response.data);
-        setUsuarios(response.data);  
+        setUsuarios(response.data);
       } catch (error) {
         message.error("Error al obtener la lista de usuarios");
         console.error("Error:", error);
@@ -27,9 +27,9 @@ const BotonGrupo = () => {
       setLoading(false);
     };
 
-    const userData = JSON.parse(localStorage.getItem('user')); 
+    const userData = JSON.parse(localStorage.getItem('user'));
     if (userData && userData.email) {
-      setUserEmail(userData.email); 
+      setUserEmail(userData.email);
     }
 
     fetchUsuarios();
@@ -53,21 +53,29 @@ const BotonGrupo = () => {
         }
 
         const groupData = {
-          created_by: userEmail,  
+          created_by: userEmail,
           description: values.descripcion,
-          members: values.miembros, 
-          name: values.nombreGrupo,  
+          members: values.miembros,
+          name: values.nombreGrupo,
         };
 
         try {
-          const response = await axiosInstance.post('groups', groupData);  // Usando la instancia de axios configurada
+          const response = await axiosInstance.post('groups', groupData);
           console.log("Grupo creado:", response.data);
           message.success("Grupo creado exitosamente");
           setVisible(false);
           form.resetFields();
+          if (fetchGrupos) {
+            await fetchGrupos(); // Actualiza la lista de grupos
+          }
         } catch (error) {
           console.error("Error al crear el grupo:", error);
-          message.error("Error al crear el grupo");
+          // Verifica si el error es por un grupo duplicado
+          if (error.response && error.response.status === 400 && error.response.data.message) {
+            message.error(error.response.data.message); // Muestra el mensaje del backend
+          } else {
+            message.error("Error al crear el grupo"); // Mensaje genérico para otros errores
+          }
         }
       })
       .catch(error => {
@@ -90,7 +98,6 @@ const BotonGrupo = () => {
         }}
         onClick={showModal}
       />
-
       <Modal
         title="Crear Nuevo Grupo"
         open={visible}
@@ -103,25 +110,23 @@ const BotonGrupo = () => {
           <Form.Item
             label="Nombre del Grupo"
             name="nombreGrupo"
-            rules={[{ required: true, message: 'Por favor, ingresa un nombre' }]}>
+            rules={[{ required: true, message: 'Por favor, ingresa un nombre' }]}
+          >
             <Input placeholder="Ingrese el nombre del grupo" />
           </Form.Item>
-
           <Form.Item
             label="Descripción"
             name="descripcion"
-            rules={[{ required: true, message: 'Por favor, ingresa una descripción' }]}>
+            rules={[{ required: true, message: 'Por favor, ingresa una descripción' }]}
+          >
             <TextArea rows={3} placeholder="Ingrese una descripción" />
           </Form.Item>
-
           <Form.Item
             label="Seleccionar Miembros"
             name="miembros"
-            rules={[{ required: true, message: 'Seleccione al menos un usuario' }]}>
-            <Select
-              mode="multiple"
-              placeholder="Seleccione los usuarios"
-              loading={loading}>
+            rules={[{ required: true, message: 'Seleccione al menos un usuario' }]}
+          >
+            <Select mode="multiple" placeholder="Seleccione los usuarios" loading={loading}>
               {usuarios && usuarios.length > 0 ? (
                 usuarios.map(user => (
                   <Option key={user.email} value={user.email}>

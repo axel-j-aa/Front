@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Card, Button, Select, Row, Col, Space } from 'antd';
 import { TeamOutlined, ArrowRightOutlined, ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import axiosInstance from '../../axiosConfig'; // Importamos la instancia configurada de axios
+import axiosInstance from '../../axiosConfig';
 import TaskGroup from './Task-Group';
 import './MisGruposPage.css';
 
@@ -60,7 +60,8 @@ const MisGruposPage = () => {
     setFiltro(groupName);
   };
 
-  const tareasFiltradas = filtro ? tareas.filter(tarea => tarea.groupName === filtro) : tareas;
+  // Si filtro está vacío (Todos los grupos), no mostramos ninguna tarea
+  const tareasFiltradas = filtro === '' ? [] : tareas.filter(tarea => tarea.groupName === filtro);
 
   const estados = ['Por hacer', 'En proceso', 'Hecho'];
 
@@ -95,7 +96,7 @@ const MisGruposPage = () => {
               onChange={filtrarTareas}
               placeholder="Selecciona un grupo"
             >
-              <Option value="">Todos los grupos</Option>
+              <Option value="">Selecciona un grupo</Option>
               {grupos.map(grupo => (
                 <Option key={grupo.name} value={grupo.name}>
                   {grupo.name}
@@ -104,7 +105,6 @@ const MisGruposPage = () => {
             </Select>
           </Space>
 
-          {/* Tablero Kanban */}
           <Row gutter={16} className='kanban-board'>
             {estados.map(estado => (
               <Col span={8} key={estado}>
@@ -122,7 +122,7 @@ const MisGruposPage = () => {
                       key={tarea.id}
                       title={tarea.nameTask}
                       bordered={false}
-                      style={{ marginBottom: '16px', backgroundColor: '#f5f5dc', border: '2px solid rgb(255, 255, 255)'}}
+                      style={{ marginBottom: '16px', backgroundColor: '#f5f5dc', border: '2px solid rgb(255, 255, 255)' }}
                     >
                       <p>{`Estado: ${tarea.status}`}</p>
                       <p>{`Descripción: ${tarea.description}`}</p>
@@ -132,19 +132,19 @@ const MisGruposPage = () => {
                           <>
                             <Button
                               ghost
-                              icon={<ArrowLeftOutlined style={{color: 'black'}} />}
+                              icon={<ArrowLeftOutlined style={{ color: 'black' }} />}
                               onClick={() => moverEstado(tarea.id, 'Por hacer')}
                               disabled={tarea.status === 'Por hacer'}
                             />
                             <Button
                               ghost
-                              icon={<ArrowRightOutlined style={{color: 'black'}} />}
+                              icon={<ArrowRightOutlined style={{ color: 'black' }} />}
                               onClick={() => moverEstado(tarea.id, 'En proceso')}
                               disabled={tarea.status === 'En proceso'}
                             />
                             <Button
                               ghost
-                              icon={<CheckCircleOutlined style={{color: 'green'}} />}
+                              icon={<CheckCircleOutlined style={{ color: 'green' }} />}
                               onClick={() => moverEstado(tarea.id, 'Hecho')}
                               disabled={tarea.status === 'Hecho'}
                             />
@@ -166,7 +166,6 @@ const MisGruposPage = () => {
               </Col>
             ))}
           </Row>
-
         </Content>
         <TaskGroup fetchTareas={fetchTareas} grupoNombre={filtro} />
       </Layout>
